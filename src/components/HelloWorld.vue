@@ -1,7 +1,7 @@
 <template>
   <div class="hello">
     <div class="vfd-container">
-      <vfd ref="vfd" :canvasHeight="canvasHeight" />
+      <vfd ref="vfd" />
     </div>
   </div>
 </template>
@@ -15,14 +15,51 @@ export default {
     vfd
   },
   mounted() {
-    this.$refs.vfd.loadFlow(this.showData)
+    let tData = JSON.parse(this.timeLineData);
+    tData.map((item, index) => {
+      this.showData.nodeList.push({
+        type: "child-flow",
+        nodeName: item.statusType,
+        icon: "ChildFlowIcon",
+        id: String(item.id),
+        height: 50,
+        x: 100,
+        width: 50,
+        y: 100 + index * 100
+      });
+      if (tData[index + 1]) {
+        this.showData.linkList.push({
+          type: "link",
+          sourceId: String(tData[index].id),
+          targetId: String(tData[index+1].id),
+          cls: {
+            linkType: "Flowchart",
+            linkColor: "#2a2929"
+          }
+        });
+      }
+    });
+    this.$refs.vfd.loadFlow(JSON.stringify(this.showData));
   },
   data() {
     return {
       msg: "Welcome to Your Vue.js App",
-      showData:
-        '{"nodeList":[{"type":"child-flow","nodeName":"网关","icon":"ChildFlowIcon","id":"1","height":50,"x":100,"width":50,"y":100},{"type":"child-flow","nodeName":"人工节点","icon":"ChildFlowIcon","id":"2","height":50,"x":100,"width":120,"y":200},{"type":"child-flow","nodeName":"人工节点","icon":"ChildFlowIcon","id":"3","height":50,"x":100,"width":120,"y":300}],"linkList":[{"type":"link","sourceId":"1","targetId":"2","cls":{"linkType":"Flowchart","linkColor":"#2a2929"}},{"type":"link","sourceId":"2","targetId":"3","cls":{"linkType":"Flowchart","linkColor":"#2a2929"}}],"attr":{"id":""},"config":{"showGrid":false,"showGridText":"显示网格","showGridIcon":"eye"},"status":"1","remarks":[]}',
-      canvasHeight: 'height: 1500px'
+      showData: {
+        nodeList: [],
+        linkList: [],
+        attr: {
+          id: ""
+        },
+        config: {
+          showGrid: false,
+          showGridText: "显示网格",
+          showGridIcon: "eye"
+        },
+        status: "1",
+        remarks: []
+      },
+      timeLineData:
+        '[{"id":45,"name":"大叶凤尾","reviewer_name":"admin","status":2,"remark":"","create_time":"2020-08-20 13:38:17","statusType":"审核成功"},{"id":44,"name":"大叶凤尾","reviewer_name":"admin","status":2,"remark":"","create_time":"2020-08-20 13:38:09","statusType":"审核成功"},{"id":43,"name":"大叶凤尾","reviewer_name":"admin","status":1,"remark":"","create_time":"2020-08-20 13:38:00","statusType":"提交审核"},{"id":42,"name":"大叶凤尾","reviewer_name":"admin","status":4,"remark":"1","create_time":"2020-08-20 13:37:49","statusType":"已驳回"}]'
     };
   }
 };
@@ -44,8 +81,14 @@ export default {
       display: none;
     }
     /deep/ .ant-layout {
-      width: 500px;
+      width: 100%;
       height: 1500px;
+      // .ant-layout-header {
+      //   display: none;
+      // }
+      // .ant-layout-footer {
+      //   display: none;
+      // }
     }
   }
 }
